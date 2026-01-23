@@ -1,2 +1,2 @@
 # jenkins-helper
-Jenkins shared library for groovy helper methods.
+Shared library for jenkins helper methods.
