@@ -1,2 +1,4 @@
-# jenkins-helper
-Shared library for jenkins helper methods.
+# jenkins-pipeline-helper-shared-library
+Shared library that contains helper functionality to simplify pipeline logic.
+
+Methods Included:
