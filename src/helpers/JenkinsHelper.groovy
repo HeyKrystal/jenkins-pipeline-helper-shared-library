@@ -18,7 +18,7 @@ class JenkinsHelper implements Serializable {
     /**
      * Constructor
      */
-    Helpers(def script) {
+    JenkinsHelper(def script) {
         this.script = script
     }
 
