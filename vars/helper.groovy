@@ -2,6 +2,7 @@
  * Jenkins automatically instantiates vars/*.groovy files.
  * We return a JenkinsHelper instance explicitly for clarity.
  */
+import groovy.transform.Field
 import helpers.JenkinsHelper
 
 // Singleton instance
