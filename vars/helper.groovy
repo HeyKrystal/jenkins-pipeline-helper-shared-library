@@ -1,5 +1,3 @@
-
-
 /**
  * Jenkins automatically instantiates vars/*.groovy files.
  * We return a JenkinsHelper instance explicitly for clarity.
