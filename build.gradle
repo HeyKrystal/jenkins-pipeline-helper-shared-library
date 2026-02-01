@@ -1,0 +1,40 @@
+plugins {
+  id 'groovy'
+}
+
+repositories {
+  mavenCentral()
+  maven { url 'https://repo.jenkins-ci.org/public/' }
+}
+
+dependencies {
+  // Groovy runtime for compilation/tests (Gradle will pick a compatible version)
+  implementation localGroovy()
+
+  // Unit test framework
+  testImplementation 'junit:junit:4.13.2'
+
+  // Jenkins Pipeline Unit test harness (tests vars/ and your src/ usage)
+  testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.22'
+}
+
+sourceSets {
+  main {
+    groovy {
+      srcDirs = ['src']          // compile your classes
+    }
+    resources {
+      srcDirs = ['resources']
+    }
+  }
+  test {
+    groovy {
+      srcDirs = ['test']         // your unit tests
+    }
+  }
+}
+
+// Make Gradle fail fast on compilation warnings if you want stricter behavior later
+tasks.withType(GroovyCompile).configureEach {
+  groovyOptions.forkOptions.jvmArgs += ['-Dfile.encoding=UTF-8']
+}
