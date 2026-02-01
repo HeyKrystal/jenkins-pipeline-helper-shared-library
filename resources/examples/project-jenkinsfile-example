@@ -1,0 +1,59 @@
+// Make the shared library available
+@Library('jenkins-pipeline-helper-shared-library@main') _
+
+/**
+ * Example Jenkins Pipeline for a Python project.
+ *
+ * This pipeline checks out repo, validates code with linting and tests,
+ * builds an artifact, and then deploys the artifact to a target environment.
+ * Finally, it sends a build result notification to a Discord channel.
+ */
+pipeline {
+
+  // Use whatever agent you normally use
+  agent {
+    label 'oakbeaver'
+  }
+
+  // Again, whatever options you normally want
+  options {
+    timestamps()
+    ansiColor('xterm')
+    disableConcurrentBuilds()
+  }
+
+  // Suggested stages are init, validate, build, deploy
+  stages {
+    // Check out scm and override library defaults
+    stage('Init') {
+      steps { core.checkout() }
+      steps {
+        defaults.override()
+          .withPythonDockerImage('python:3.12-slim')
+          .withKeepReleases(7)
+      }
+    }
+    // Validate code with linting and tests
+    stage('Validate') {
+      // Multilingual projects can be validated.
+      steps { python.validate() } // ruff + pytest + compileall
+      steps { shell.validate() } // shellcheck
+    }
+    // Build the Python project artifact
+    stage('Build') {
+      steps { python.build() }
+    }
+    // Deploy to 'Machine1' target with SSH credentials
+    stage('Deploy') {
+      steps { python.deploy('Machine1', 'machine1-ssh-credential-id') }
+    }
+  }
+
+  // Always send build results to Discord
+  post {
+    always {
+      // Requires a valid Discord webhook URL in a Jenkins secret text credential
+      discord.sendBuildResultNotification('discord-webhook-credential-id') 
+    }
+  }
+}

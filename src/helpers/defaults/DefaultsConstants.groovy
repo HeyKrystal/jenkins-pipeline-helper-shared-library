@@ -14,7 +14,7 @@ class DefaultsConstants {
     static final int DEFAULT_KEEP_RELEASES = 5
 
     // ===== Python defaults =====
-    static final String DEFAULT_PYTHON_VALIDATION_DOCKER_IMAGE = 'python:3.12-slim'
+    static final String DEFAULT_PYTHON_DOCKER_IMAGE = 'python:3.12-slim'
 
     // ===== Java defaults =====
     static final String DEFAULT_JDK_TOOL = 'temurin-21'  // example if you ever use tools

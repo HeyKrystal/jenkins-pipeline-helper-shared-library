@@ -67,7 +67,7 @@ class PythonValidate implements Serializable {
               python -m ruff --version >/dev/null 2>&1 && python -m ruff check . --no-cache
 
               # Tests (pytest) - run only if tests exist
-              if find . -type f \\( -name "test_*.py" -o -name "*_test.py" \\) -print -quit 2>/dev/null | grep -q .; then
+              if find . -type f \( -name "test_*.py" -o -name "*_test.py" \) -print -quit 2>/dev/null | grep -q .; then
                 python -m pytest -q --disable-warnings --maxfail=1
               else
                 echo "No tests found; skipping pytest."

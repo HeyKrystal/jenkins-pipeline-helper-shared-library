@@ -94,7 +94,7 @@ class Discord implements Serializable {
     /**
      * Send a Discord embed message via webhook.
      */
-    public sendDiscordEmbed(String webhookCredentialId) {
+    public sendBuildResultNotification(String webhookCredentialId) {
 
         script.withCredentials([script.string(credentialsId: webhookCredentialId, variable: 'DISCORD_WEBHOOK_URL')]) {
             def webhookUrl = script.env.DISCORD_WEBHOOK_URL

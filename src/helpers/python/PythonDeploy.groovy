@@ -76,7 +76,7 @@ class PythonDeploy implements Serializable {
                                            usernameVariable: 'SSH_USER')]) {
             
             // Run deploy steps
-            script.sh '''
+            def cmd = '''
                 set -eux
 
                 # Make sure target dirs exist
@@ -113,6 +113,8 @@ class PythonDeploy implements Serializable {
                 fi
                 "
             '''
+
+            script.sh(cmd)
         }
     }
 
