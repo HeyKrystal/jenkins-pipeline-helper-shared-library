@@ -2,33 +2,32 @@ import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
 import org.junit.Test
 
-class LibrarySmokeTest extends BasePipelineTest {
+class DefaultsSmokeTest extends BasePipelineTest {
 
-  def script
+  def defaultsScript
 
   @Before
   void setUp() {
     super.setUp()
 
-    // Stub pipeline steps you call from library code
-    helper.registerAllowedMethod('sh', [Map], { Map m -> return "" })
-    helper.registerAllowedMethod('sh', [String], { String s -> return "" })
-    helper.registerAllowedMethod('withCredentials', [List, Closure], { List l, Closure c -> c.call() })
-    helper.registerAllowedMethod('archiveArtifacts', [Map], { Map m -> null })
-    helper.registerAllowedMethod('checkout', [Object], { Object o -> null })
+    // stub steps if any vars call them (safe to keep)
+    helper.registerAllowedMethod('sh', [Map], { Map m -> "" })
+    helper.registerAllowedMethod('sh', [String], { String s -> "" })
 
-    // Provide common pipeline globals used by your code
     binding.setVariable('env', [:])
-    binding.setVariable('currentBuild', [currentResult: 'SUCCESS', startTimeInMillis: System.currentTimeMillis()])
+    binding.setVariable('currentBuild', [currentResult: 'SUCCESS'])
     binding.setVariable('scm', null)
 
-    // Load a vars/ script to ensure it parses and can be invoked
-    script = loadScript('vars/defaults.groovy')
+    defaultsScript = loadScript('vars/defaults.groovy')
   }
 
   @Test
-  void 'defaults.override returns builder'() {
-    def b = script.override()
-    assert b != null
+  void 'override sets keepReleases in script-backed defaults'() {
+    def builder = defaultsScript.override()
+    builder.withKeepReleases(7)
+
+    // Now load Defaults.of(script) using the same pipeline script binding
+    def cfg = helpers.defaults.Defaults.of(this)
+    assert cfg.getKeepReleases() == 7
   }
 }
