@@ -10,7 +10,7 @@
 package helpers.python
 
 import helpers.defaults.Defaults
-import helpers.targets.Targets
+import helpers.core.Targets
 
 class PythonDeploy implements Serializable { 
 
