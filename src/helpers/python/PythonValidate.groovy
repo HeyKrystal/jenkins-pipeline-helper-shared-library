@@ -33,7 +33,7 @@ class PythonValidate implements Serializable {
     public void validate() {
 
         // Run dockerized validation
-        script.sh """
+        def cmd = '''
           set -eux
 
           # Run validation inside a fresh container on the agent
@@ -42,8 +42,8 @@ class PythonValidate implements Serializable {
             -e HOME=/tmp \
             -e PIP_CACHE_DIR=/tmp/pip-cache \
             -e PATH="/tmp/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
-            -v "\$PWD:/work" -w /work \
-            "${defaults.getPythonValidationDockerImage()}" \
+            -v "$PWD:/work" -w /work \
+            __IMAGE__ \
             sh -lc '
               set -eux
 
@@ -76,6 +76,9 @@ class PythonValidate implements Serializable {
               # Extra sanity: ensure files compile
               python -m compileall -q .
             '
-        """
+        '''
+        .replace('__IMAGE__', "'${defaults.getPythonValidationDockerImage()}'")
+
+        script.sh(cmd)
     }
 }
