@@ -16,6 +16,7 @@ pipeline {
       steps {
         sh '''
         set -eu
+
         docker run --rm \
             -u "$(id -u):$(id -g)" \
             -v "$PWD:/work" -w /work \
@@ -28,7 +29,7 @@ pipeline {
 
   post {
     always {
-      junit 'build/test-results/test/*.xml'
+      junit allowEmptyResults: true, testResults: 'build/test-results/test/*.xml'
     }
   }
 }
