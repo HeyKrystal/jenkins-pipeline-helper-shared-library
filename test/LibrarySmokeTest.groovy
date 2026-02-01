@@ -27,7 +27,7 @@ class DefaultsSmokeTest extends BasePipelineTest {
     builder.withKeepReleases(7)
 
     // Now load Defaults.of(script) using the same pipeline script binding
-    def cfg = helpers.defaults.Defaults.of(this)
-    assert cfg.getKeepReleases() == 7
+    def cfg = helpers.defaults.Defaults.of(defaultsScript)
+    assert cfg.getKeepReleases() == 7 : "expected 7, got ${cfg.getKeepReleases()}"
   }
 }
