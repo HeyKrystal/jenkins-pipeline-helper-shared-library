@@ -3,7 +3,6 @@
  *
  * Intentionally:
  * - Stateless
- * - Side-effect free (unless explicitly documented)
  * - Return values instead of chaining
  *
  * Designed for readability and predictability.
@@ -22,6 +21,9 @@ class Template implements Serializable {
         this.script = script
     }
 
+    /**
+     * Sample method
+     */
     String groovyWorld() {
         return "Groovy World!"
     }

@@ -1,6 +1,5 @@
 /**
  * Jenkins automatically instantiates vars/*.groovy files.
- * We return class instances explicitly for clarity.
  */
 import groovy.transform.Field
 import helpers.discord.Discord
