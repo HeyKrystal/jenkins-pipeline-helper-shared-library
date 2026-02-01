@@ -15,8 +15,12 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          set -eu
-          ./gradlew test
+        set -eu
+        docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v "$PWD:/work" -w /work \
+            gradle:8-jdk17 \
+            gradle test
         '''
       }
     }
