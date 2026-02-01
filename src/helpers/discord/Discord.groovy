@@ -3,7 +3,6 @@
  *
  * Intentionally:
  * - Stateless
- * - Side-effect free (unless explicitly documented)
  * - Return values instead of chaining
  *
  * Designed for readability and predictability.
@@ -26,67 +25,63 @@ class Discord implements Serializable {
     /**
      * Constructor
      */
-    Discord(def script, GitInfo gitInfo) {
+    Discord(def script) {
         this.script = script
         this.gitInfo = new GitInfo(script)
         this.jenkins = new Jenkins(script)
     }
 
-    private String authorTextFromResult(String result) {
+    /**
+     * Determine author text based on build result.
+     */
+    private Tuple2<String, int> authorAndColorFromResult(String result) {
         
         switch(result?.toUpperCase()) {
             case "SUCCESS":
-                return (script.env.DEPLOYED == "true" ? "✅ DEPLOY COMPLETE" : "✅ BUILD COMPLETE") // Green
+                return new Tuple2(script.env.DEPLOYED == "true" ? "✅ DEPLOY COMPLETE" : "✅ BUILD COMPLETE", 0x2ECC71) // Green
             case "UNSTABLE":
-                return "⚠️ BUILD UNSTABLE" // Yellow
+                return new Tuple2("⚠️ BUILD UNSTABLE", 0xF1C40F) // Yellow
             case "FAILURE":
-                return "❌ BUILD FAILED" // Red
+                return new Tuple2("❌ BUILD FAILED", 0xE74C3C) // Red
             case "ABORTED":
-                return "🛑 BUILD ABORTED" // Red
+                return new Tuple2("🛑 BUILD ABORTED", 0xE74C3C) // Red
             case "NOT_BUILT":
-                return "🤔 BUILD NOT BUILT" // Yellow
+                return new Tuple2("🤔 BUILD NOT BUILT", 0xF1C40F) // Yellow
             default:
-                return "🌀 UNKNOWN BUILD RESULT" // Blue for unknown
+                return new Tuple2("🌀 UNKNOWN BUILD RESULT", 0x3498DB) // Blue for unknown
         }
     }
 
-    private severityColorFromResult(String result) {
-
-        switch(result?.toUpperCase()) {
-            case "SUCCESS":
-                return 0x2ECC71 // Green
-            case "UNSTABLE":
-                return 0xF1C40F // Yellow
-            case "FAILURE":
-                return 0xE74C3C // Red
-            case "ABORTED":
-                return 0xE74C3C // Red
-            case "NOT_BUILT":
-                return 0xF1C40F // Yellow
-            default:
-                return 0x3498DB // Blue for unknown
-        }
-    }
-
+    /**
+     * Build the JSON payload for Discord embeded message.
+     */
     private String buildEmbedJSONPayload() {
 
+        // Reference to environment
         def env = script.env
+
+        // Precalculate some json members.
+        int durationSeconds = jenkins.getBuildTimeInSeconds()
+        String durationText = (durationSeconds > 60 ? String.format("%dm %ds", durationSeconds / 60, durationSeconds % 60) : "${durationSeconds}s")
+        String buildResult = currentBuild.currentResult ?: "UNKNOWN"
+        def (authorTextFromResult, severityColorFromResult) = authorAndColorFromResult(buildResult)
+
+        // Generate json payload.
         String discordPayload = JsonOutput.toJson([
           username: "${env.NODE_NAME_ALT ?: env.NODE_NAME ?: 'Jenkins'}",
           avatar_url: "${env.NODE_ICON_URL}",
           embeds: [
             [
-              author: [ name: "${authorTextFromResult(env.BUILD_STATUS)}" ],
-              color: severityColorFromResult(env.BUILD_STATUS),
+              author: [ name: "${authorTextFromResult}" ],
+              color: severityColorFromResult,
               title: "${env.JOB_NAME}",
               url: "${env.BUILD_URL}",
-              description: "Jenkins built commit `${sha}` on branch `${env.BRANCH_NAME}`.\n" +
-                           (deployed == "true" ? "Deployed to *${env.DEPLOY_TARGET}*." : "No deployment performed."),
+              description: "${gitInfo.lastCommitMessage()}",
               fields: [
-                [ name: "Agent", value: "${env.NODE_NAME ?: 'n/a'}", inline: true ],
-                [ name: "Duration", value: "${jenkins.getBuildTimeInSeconds()} seconds", inline: true ],
+                [ name: "Agent", value: "${env.NODE_NAME ?: 'Jenkins Node'}", inline: true ],
+                [ name: "Duration", value: "${durationText}", inline: true ],
                 [ name: "Build #", value: env.BUILD_NUMBER, inline: true ],
-                [ name: "Git SHA", value: sha, inline: true ],
+                [ name: "Git SHA", value: "${gitInfo.longCommitSha()}", inline: false ],
               ],
               footer: [ text: "IronKerberos • Jenkins" ]
             ]
@@ -96,14 +91,20 @@ class Discord implements Serializable {
         return discordPayload
     }
 
-    public sendDiscordEmbed(String webhookUrl) {
+    /**
+     * Send a Discord embed message via webhook.
+     */
+    public sendDiscordEmbed(String webhookCredentialId) {
 
-        sh """
-            set -eu
-            printf '%s' '${buildEmbedJSONPayload()}' | \
-                curl -sS -H 'Content-Type: application/json' \
-                    -d @- \
-                    "${webhookUrl}" > /dev/null
-        """
+        script.withCredentials([script.string(credentialsId: webhookCredentialId, variable: 'DISCORD_WEBHOOK_URL')]) {
+            def webhookUrl = script.env.DISCORD_WEBHOOK_URL
+            script.sh """
+                set -eu
+                printf '%s' '${buildEmbedJSONPayload()}' | \
+                    curl -sS -H 'Content-Type: application/json' \
+                        -d @- \
+                        "$DISCORD_WEBHOOK_URL" > /dev/null
+            """
+        }
     }
 }

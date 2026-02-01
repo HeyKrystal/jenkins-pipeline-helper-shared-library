@@ -1,6 +1,5 @@
 /**
  * Jenkins automatically instantiates vars/*.groovy files.
- * We return class instances explicitly for clarity.
  */
 import groovy.transform.Field
 import helpers.git.GitInfo
@@ -20,4 +19,5 @@ def getInstance() {
 def String lastCommitMessage() { getInstance().lastCommitMessage() }
 def boolean isMainBranch() { getInstance().isMainBranch() } 
 def String repoName() { getInstance().repoName() }
-def String shortCommit() { getInstance().shortCommit() }
+def String shortCommitSha() { getInstance().shortCommitSha() }
+def String longCommitSha() { getInstance().longCommitSha() }

@@ -1,0 +1,16 @@
+{
+  "targets": {
+    "Machine1": {
+      "host": "192.168.1.10",
+      "user": "user1",
+      "deployRoot": "/home/user1/bin",
+      "os": "Linux"
+    },
+    "Machine2": {
+      "host": "192.168.1.11",
+      "user": "user2",
+      "deployRoot": "C:/Users/user2/Scripts",
+      "os": "Windows 11"
+    }
+  }
+}

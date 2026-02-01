@@ -3,12 +3,10 @@
  *
  * Intentionally:
  * - Stateless
- * - Side-effect free (unless explicitly documented)
  * - Return values instead of chaining
  *
  * Designed for readability and predictability.
  */
-
 package helpers.git
 
 class GitInfo implements Serializable {
@@ -24,9 +22,9 @@ class GitInfo implements Serializable {
     }
 
     /**
-     * Optional: first line only (subject).
+     * Returns the last commit message in the current Git repository.
      */
-    String lastCommitMessage() {
+    public String lastCommitMessage() {
         def msg = triggerCommitMessage()
         if (!msg) return null
         return msg.readLines().find { it?.trim() }?.trim()
@@ -41,7 +39,7 @@ class GitInfo implements Serializable {
      *
      * Returns null if it cannot be determined.
      */
-    String triggerCommitMessage() {
+    public String triggerCommitMessage() {
         // 1) Try Jenkins changelog first (no shell)
         try {
             def cs = script.currentBuild?.changeSets
@@ -71,7 +69,7 @@ class GitInfo implements Serializable {
     /**
      * Returns true if the current branch is 'main'.
      */
-    boolean isMainBranch() {
+    public boolean isMainBranch() {
         return (script.env.BRANCH_NAME == 'main')
     }
 
@@ -84,7 +82,7 @@ class GitInfo implements Serializable {
      *
      * Returns null if the repo cannot be determined.
      */
-    String repoName() {
+    public String repoName() {
         String gitUrl = script.env.GIT_URL
 
         // Return null if none set.
@@ -101,8 +99,16 @@ class GitInfo implements Serializable {
     /**
      * Returns a short (7-char) Git commit hash if available.
      */
-    String shortCommit() {
-        def commit = script.env.GIT_COMMIT
+    public String shortCommitSha() {
+        String commit = script.env.GIT_COMMIT
         return commit ? commit.take(7) : null
+    }
+
+    /**
+     * Returns the full (40-char) Git commit hash if available.
+     */
+    public String longCommitSha() {
+        String commit = script.env.GIT_COMMIT
+        return commit ?: null
     }
 }

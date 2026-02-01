@@ -3,17 +3,18 @@
  * We return class instances explicitly for clarity.
  */
 import groovy.transform.Field
-import helpers.template.Template
+import helpers.core.Jenkins
 
 // Singleton instances
-@Field private Template _jenkinsInstance
+@Field private Jenkins _jenkinsInstance
 
-// Returns a singleton Template instance.
+// Returns a singleton Jenkins instance.
 def getInstance() {
     if (_jenkinsInstance == null) {
-        _jenkinsInstance = new Template(this)
+        _jenkinsInstance = new Jenkins(this)
     }
     return _jenkinsInstance
 }
 
 // Expose helper methods for easier access.
+def void checkout() { getInstance().checkout() }
