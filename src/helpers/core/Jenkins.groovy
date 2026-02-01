@@ -36,6 +36,6 @@ class Jenkins implements Serializable {
         long startTime = script.currentBuild.startTimeInMillis ?: System.currentTimeMillis()
         long duration = script.currentBuild.duration ?: 0L
         long endTime = startTime + duration
-        return (endTime - startTime) / 1000L
+        return (int) ((endTime - startTime) / 1000L)
     }
 }

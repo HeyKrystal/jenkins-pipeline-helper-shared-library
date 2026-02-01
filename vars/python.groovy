@@ -39,4 +39,4 @@ def getPythonDeployInstance() {
 // Expose helper methods for easier access.
 def void validate() { getPythonValidateInstance().validate() }
 def void build() { getPythonBuildInstance().build() }
-def void deploy() { getPythonDeployInstance().deploy() }
+def void deploy(String targetName, String sshCredentialsId) { getPythonDeployInstance().deploy(targetName, sshCredentialsId) }
