@@ -77,41 +77,41 @@ class PythonDeploy implements Serializable {
             
             // Run deploy steps
             def cmd = '''
-                set -eux
+              set -eux
 
-                # Make sure target dirs exist
-                ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$TARGET_HOST" "
-                set -eux
-                mkdir -p '$T_RELEASES_DIR'
-                "
+              # Make sure target dirs exist
+              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$TARGET_HOST" "
+              set -eux
+              mkdir -p '$T_RELEASES_DIR'
+              "
 
-                # Copy the artifact to target temp
-                scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ARTIFACT_PATH" \
-                "$SSH_USER@$TARGET_HOST:/tmp/$ARTIFACT_NAME"
+              # Copy the artifact to target temp
+              scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$ARTIFACT_PATH" \
+              "$SSH_USER@$TARGET_HOST:/tmp/$ARTIFACT_NAME"
 
-                # Extract to new release dir, flip current symlink, keep last N releases
-                ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$TARGET_HOST" "
-                set -eux
+              # Extract to new release dir, flip current symlink, keep last N releases
+              ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$TARGET_HOST" "
+              set -eux
 
-                # Optional runtime preflight (doesn't reinstall anything)
-                command -v ffmpeg >/dev/null 2>&1 || echo 'WARN: ffmpeg not found in PATH on FrostedStoat'
-                command -v yt-dlp >/dev/null 2>&1 || echo 'WARN: yt-dlp not found in PATH on FrostedStoat'
-                command -v curl  >/dev/null 2>&1 || echo 'WARN: curl not found in PATH on FrostedStoat'
+              # Optional runtime preflight (doesn't reinstall anything)
+              command -v ffmpeg >/dev/null 2>&1 || echo 'WARN: ffmpeg not found in PATH on FrostedStoat'
+              command -v yt-dlp >/dev/null 2>&1 || echo 'WARN: yt-dlp not found in PATH on FrostedStoat'
+              command -v curl  >/dev/null 2>&1 || echo 'WARN: curl not found in PATH on FrostedStoat'
 
-                mkdir -p '$T_RELEASE_DIR'
-                tar -xzf '/tmp/$ARTIFACT_NAME' -C '$T_RELEASE_DIR'
-                rm -f '/tmp/$ARTIFACT_NAME'
+              mkdir -p '$T_RELEASE_DIR'
+              tar -xzf '/tmp/$ARTIFACT_NAME' -C '$T_RELEASE_DIR'
+              rm -f '/tmp/$ARTIFACT_NAME'
 
-                # Atomic-ish cutover: update the symlink in one operation
-                ln -sfn '$T_RELEASE_DIR' '$T_CURRENT_LINK'
+              # Atomic-ish cutover: update the symlink in one operation
+              ln -sfn '$T_RELEASE_DIR' '$T_CURRENT_LINK'
 
-                # Cleanup: keep the newest $KEEP_RELEASES release directories
-                # (based on modification time)
-                cd '$T_RELEASES_DIR'
-                if [ -d . ]; then
-                    ls -1dt ./* 2>/dev/null | tail -n +$((KEEP_RELEASES+1)) | xargs -I{} rm -rf \"{}\"
-                fi
-                "
+              # Cleanup: keep the newest $KEEP_RELEASES release directories
+              # (based on modification time)
+              cd '$T_RELEASES_DIR'
+              if [ -d . ]; then
+                  ls -1dt ./* 2>/dev/null | tail -n +$((KEEP_RELEASES+1)) | xargs -I{} rm -rf \"{}\"
+              fi
+              "
             '''
 
             script.sh(cmd)

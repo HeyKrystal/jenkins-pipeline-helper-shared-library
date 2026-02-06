@@ -62,9 +62,9 @@ class Defaults implements Serializable {
     }
 
     // ===== Python defaults =====
-    String getPythonValidationDockerImage() {
-        def v = cfg().get('pythonValidationDockerImage')
-        return (v != null && v.toString().trim()) ? v.toString() : DefaultsConstants.DEFAULT_PYTHON_VALIDATION_DOCKER_IMAGE
+    String getPythonDockerImage() {
+        def v = cfg().get('pythonDockerImage')
+        return (v != null && v.toString().trim()) ? v.toString() : DefaultsConstants.DEFAULT_PYTHON_DOCKER_IMAGE
     }
 
     // ===== Java defaults =====
@@ -80,7 +80,7 @@ class Defaults implements Serializable {
     void setKeepReleases(int n) { put('keepReleases', n) }
 
     // ===== Python defaults =====
-    void setPythonValidationDockerImage(String s) { put('pythonValidationDockerImage', s) }
+    void setPythonDockerImage(String s) { put('pythonDockerImage', s) }
 
     // ===== Java defaults =====
     void setJDKTool(String s) { put('jdkTool', s) }

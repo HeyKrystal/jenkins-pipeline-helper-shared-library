@@ -16,4 +16,4 @@ def getInstance() {
 }
 
 // Expose helper methods for easier access.
-def void sendDiscordEmbed(String webhookCredentialId) { getInstance().sendDiscordEmbed(webhookCredentialId) }
+def void sendBuildResultNotification(String webhookCredentialId) { getInstance().sendBuildResultNotification(webhookCredentialId) }

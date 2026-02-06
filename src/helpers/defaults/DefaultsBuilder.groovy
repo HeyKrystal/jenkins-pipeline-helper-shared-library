@@ -32,8 +32,8 @@ class DefaultsBuilder implements Serializable {
     }
 
     // ===== Python defaults =====
-    DefaultsBuilder withPythonValidationDockerImage(String image) {
-        defaults.setPythonValidationDockerImage(image)
+    DefaultsBuilder withPythonDockerImage(String image) {
+        defaults.setPythonDockerImage(image)
         return this
     }
 
